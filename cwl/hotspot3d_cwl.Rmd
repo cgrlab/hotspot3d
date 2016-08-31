@@ -1,6 +1,6 @@
 
 ```{r include = FALSE}
-require(rmarkdown); require(knitr); require(sevenbridges); require(readr)
+require(rmarkdown); require(knitr); require(sevenbridges); require(readr); require(jsonlite);
 
 options(max.print = "99"); opts_knit$set(width = 99)
 opts_chunk$set(cache=FALSE, tidy=FALSE)
@@ -79,9 +79,17 @@ outputs = outputs
 
 ```
 
+### Make cwl file
+
+```{r make cwl, eval=destination=="platform"}
+
+write(tool$toJSON(pretty = TRUE), "hotspot3d_cwl.json")
+
+```
+
 ### Push app to sbg platform
 
-```{r 6 push app to sbg, eval=destination=="platform"}
+```{r push app to sbg, eval=destination=="platform"}
 
 project$app_add("hotspot3d", tool)
 
