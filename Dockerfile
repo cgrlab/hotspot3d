@@ -1,7 +1,4 @@
-# Pull base image.
 FROM ubuntu:14.04
-
-MAINTAINER  david.roberson@nih.gov
 
 USER root
 
@@ -31,5 +28,3 @@ RUN git clone https://github.com/ding-lab/hotspot3d && \
 cd hotspot3d && \
 cpanm HotSpot3D-#.#.tar.gz
 
-ENTRYPOINT []
-CMD ls

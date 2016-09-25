@@ -96,3 +96,32 @@ project$app_add("hotspot3d", tool)
 
 ```
 
+
+### Notes
+
+These columns are required
+
+Hugo_Symbol
+
+Chromosome
+
+Start_Position
+
+End_Position
+
+Variant_Classification
+
+Reference_Allele
+
+Tumor_Seq_Allele1
+
+Tumor_Seq_Allele2
+
+Tumor_Sample_Barcode
+
+with 2 non-standard columns:
+
+a transcript ID column
+
+a protein peptide change column (HGVS p. single letter abbreviations, ie p.T790M)
+
