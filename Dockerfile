@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-USER root
+WORKDIR /opt
 
 ENV PATH $OPT/bin:$PATH
 
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     cpanminus
 
 RUN cpanm --local-lib=~/perl5 local::lib && \
-eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib) \
+eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
 RUN apt-get install libwww-perl
 
@@ -26,5 +26,5 @@ cpanm Test-Most-0.34.tar.gz
 
 RUN git clone https://github.com/ding-lab/hotspot3d && \
 cd hotspot3d && \
-cpanm HotSpot3D-#.#.tar.gz
+cpanm HotSpot3D-0.5.4.tar.gz
 
