@@ -7,7 +7,7 @@ Usage
 -----
 
         Program:     HotSpot3D - 3D mutation proximity analysis program.
-        Version:     V0.5.1
+        Version:     V0.5.4
          Author:     Beifang Niu, John Wallis, Adam D Scott, & Sohini Sengupta
 
   Usage: hotspot3d <command> [options]
@@ -160,7 +160,7 @@ Example - Analysis
 
 3. Cluster pairwise data:
 
-		hotspot3d cluster --collapsed-file=3D_Proximity.pairwise.singleprotein.collapsed --pairwise-file=3D_Proximity.pairwise
+		hotspot3d cluster --collapsed-file=3D_Proximity.pairwise.singleprotein.collapsed --pairwise-file=3D_Proximity.pairwise --maf-file=your.maf
 
 4. Cluster significance calculation:
 
