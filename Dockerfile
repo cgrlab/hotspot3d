@@ -4,17 +4,17 @@ USER root
 
 ENV PATH $OPT/bin:$PATH
 
-# setup system
-
-RUN apt-get -yq update && \
-apt-get -yq install xvfb && \
-apt-get install -y wget && \
-rm -rf /var/lib/apt/lists/* && \
-apt-get install git && \
-apt-get install build-essential && \
-apt-get install cpanminus
-
-# install hotspot3d
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    ca-certificates \
+    xvfb \
+    wget \
+    curl \
+    unzip \
+    git \
+    libcurl4-gnutls-dev \
+    libgnutls-dev \
+    cpanminus
 
 RUN cpanm --local-lib=~/perl5 local::lib && \
 eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib) \
