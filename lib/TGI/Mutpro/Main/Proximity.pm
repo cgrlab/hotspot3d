@@ -18,6 +18,10 @@ use FileHandle;
 
 use TGI::Mutpro::Preprocess::AminoAcid;
 
+my $PVALUEDEFAULT = 0.05;
+my $DISTANCEDEFAULT = 10;
+my $MAXDISTANCE = 100;
+
 sub new {
     my $class = shift;
     my $this = {};
@@ -27,9 +31,9 @@ sub new {
     $this->{'data_dir'} = undef;
     $this->{'drugport_file'} = undef;
     $this->{'output_prefix'} = '3D_Proximity';
-    $this->{'pvalue_cutoff'} = 0.05;
-    $this->{'3d_distance_cutoff'} = 10;
-    $this->{'linear_cutoff'} = 20;
+    $this->{'pvalue_cutoff'} = undef;
+    $this->{'3d_distance_cutoff'} = undef;
+    $this->{'linear_cutoff'} = 0;
     $this->{'stat'} = undef;
     $this->{'acceptable_types'} = undef;
     $this->{'amino_acid_header'} = "amino_acid_change";
@@ -59,6 +63,19 @@ sub process {
     );
     if ( $help ) { print STDERR help_text(); exit 0; }
     unless( $options ) { die $this->help_text(); }
+	if ( not defined $this->{'pvalue_cutoff'} ) {
+        if ( not defined $this->{'3d_distance_cutoff'} and not defined $this->{'pvalue_cutoff'} ) {
+            warn "HotSpot3D::Cluster warning: no pair distance limit given, setting to default p-value cutoff = 0.05\n";
+            $this->{'pvalue_cutoff'} = $PVALUEDEFAULT;
+            $this->{'3d_distance_cutoff'} = $MAXDISTANCE;
+        } else {
+            $this->{'pvalue_cutoff'} = 1;
+        }
+    } else {
+        if ( not defined $this->{'3d_distance_cutoff'} ) {
+            $this->{'3d_distance_cutoff'} = $MAXDISTANCE;
+        }
+    }
     unless( $this->{'data_dir'} ) { warn 'You must provide a output directory ! ', "\n"; die help_text(); }
     unless( -d $this->{'data_dir'} ) { warn 'You must provide a valid data directory ! ', "\n"; die help_text(); }
     unless( $this->{'maf'} and (-e $this->{'maf'}) ) { warn 'You must provide a MAF format file ! ', "\n"; die $this->help_text(); }
@@ -298,18 +315,18 @@ sub proximitySearching {
             my ( $uid1, $chain1, $pdbcor1, $offset1, $residue1, $domain1, $cosmic1, 
                  $uid2, $chain2, $pdbcor2, $offset2, $residue2, $domain2, $cosmic2, 
                  $proximityinfor ) = @ta;
-			if ( $drugportref ) { 
-				if ( $AA->filterWater( $residue1 ) and $AA->filterWater( $residue2 ) ) { next; }
-			} else {
-				if ( $AA->checkAA( $residue1 ) and $AA->checkAA( $residue2 ) ) { next; }
-			}
-            my $uniprotcor1 = $pdbcor1 + $offset1; 
+			my $uniprotcor1 = $pdbcor1 + $offset1;
             my $uniprotcor2 = $pdbcor2 + $offset2;
             my $lineardis = undef;
             if ( $uid1 eq $uid2 ) { $lineardis = abs($uniprotcor1 - $uniprotcor2) } else { $lineardis = "N\/A"; }
             #print $a."\t".$uid2."\t".$uniprotcor1."\t".$uniprotcor2."\t".$lineardis."\n";
             if ( defined $mafHashref->{$a}->{$uniprotcor1} ) {
                 if ( defined $mafHashref->{$uid2}->{$uniprotcor2} ) {
+					#warn "check AA - ".$residue1." - ".$residue2;
+					if ( !( $AA->isAA( $residue1 ) ) || !( $AA->isAA( $residue2 ) ) ) { 
+						#warn " - bad AA pair"."\n";
+						next;
+					}
                     ## close each other
                     foreach my $c ( keys %{$mafHashref->{$a}->{$uniprotcor1}} ) {
                         foreach my $d ( keys %{$mafHashref->{$uid2}->{$uniprotcor2}} ) {
@@ -353,6 +370,10 @@ sub proximitySearching {
             }
             # drugport searching
 			if ( $drugportref ) {
+				if ( $AA->isHOH( $residue1 ) || $AA->isHOH( $residue2 ) ) {
+					#warn "bad AA pair: ".$residue1." - ".$residue2."\n";
+					next;
+				}
 				my %pdbs_hash = map{ my @t0 = split / /, $_; ($t0[1], 1) } split /\|/, $proximityinfor;
 				my ( $real_chain1 ) = $chain1 =~ /\[(\w)\]/; my ( $real_chain2 ) = $chain2 =~ /\[(\w)\]/;
 				my ( $e, $iter ); 
@@ -524,7 +545,7 @@ Usage: hotspot3d search [options]
 --missense-only              missense mutation only, default: no
 --p-value-cutoff             p_value cutoff(<=), default: 0.05
 --3d-distance-cutoff         3D distance cutoff (<=), default: 10
---linear-cutoff              Linear distance cutoff (>= peptides), default: 20 
+--linear-cutoff              Linear distance cutoff (>= peptides), default: 0 
 --transcript-id-header       MAF file column header for transcript id's, default: transcript_name
 --amino-acid-header          MAF file column header for amino acid changes, default: amino_acid_change 
 
