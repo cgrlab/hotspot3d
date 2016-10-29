@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     libgnutls-dev \
     cpanminus \
     libwww-perl
+    
+RUN wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
+RUN chmod a+x blat
 
 RUN cpanm --local-lib=~/perl5 local::lib && \
 eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
