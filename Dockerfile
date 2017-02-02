@@ -28,5 +28,5 @@ cpanm Test-Most-0.34.tar.gz
 
 RUN git clone https://github.com/cgrlab/hotspot3d && \
 cd hotspot3d && \
-cpanm HotSpot3D-0.6.3.tar.gz
+cpanm HotSpot3D-1.1.4.tar.gz
 
